@@ -1,0 +1,67 @@
+[gd_scene load_steps=12 format=3 uid="uid://de655s3nfpvdb"]
+
+[ext_resource type="Script" uid="uid://dogbhw7g2aapg" path="res://script/player.gd" id="1_xa75v"]
+[ext_resource type="Texture2D" uid="uid://cwkkcwus7fe4b" path="res://art/playerGrey_walk1.png" id="1_y8w33"]
+[ext_resource type="Texture2D" uid="uid://lo76rqtk0o0k" path="res://art/playerGrey_up1.png" id="2_ivevv"]
+[ext_resource type="Texture2D" uid="uid://j4fvacnsa50o" path="res://art/playerGrey_walk2.png" id="2_xa75v"]
+[ext_resource type="Texture2D" uid="uid://dj8oovdpjia3o" path="res://art/playerGrey_up2.png" id="3_r6jsd"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p6qlh"]
+atlas = ExtResource("2_ivevv")
+region = Rect2(0, 0, 108, 135)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2sw5t"]
+atlas = ExtResource("3_r6jsd")
+region = Rect2(0, 0, 111, 120)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y8w33"]
+atlas = ExtResource("1_y8w33")
+region = Rect2(0, 0, 108, 135)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xa75v"]
+atlas = ExtResource("2_xa75v")
+region = Rect2(0, 0, 107, 127)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_r6jsd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p6qlh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2sw5t")
+}],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y8w33")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xa75v")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_p6qlh"]
+radius = 40.0
+height = 102.0
+
+[node name="Player" type="Area2D"]
+position = Vector2(399, 279)
+script = ExtResource("1_xa75v")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.75, 0.75)
+sprite_frames = SubResource("SpriteFrames_r6jsd")
+animation = &"up"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_p6qlh")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
