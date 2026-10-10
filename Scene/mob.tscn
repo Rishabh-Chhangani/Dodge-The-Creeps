@@ -73,7 +73,7 @@ radius = 37.0
 height = 102.0
 
 [node name="Mob" type="RigidBody2D" groups=["mobs"]]
-position = Vector2(388, 341)
+position = Vector2(115, 265)
 collision_mask = 0
 gravity_scale = 0.0
 script = ExtResource("1_je71b")
