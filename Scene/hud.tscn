@@ -45,16 +45,16 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="StartButoon" type="Button" parent="."]
+[node name="StartButton" type="Button" parent="."]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -85.0
-offset_top = -146.0
-offset_right = 92.0
-offset_bottom = -60.0
+offset_left = -88.5
+offset_top = -240.0
+offset_right = 88.5
+offset_bottom = -154.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_fonts/font = ExtResource("2_fmoiy")
@@ -63,9 +63,28 @@ shortcut = SubResource("Shortcut_fmoiy")
 shortcut_feedback = false
 text = "Start"
 
+[node name="InstructionLabel" type="Label" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -120.0
+offset_right = 160.0
+offset_bottom = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("2_fmoiy")
+theme_override_font_sizes/font_size = 18
+text = "Drag or Arrow Keys to Move"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
 [node name="MessageTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
 
-[connection signal="pressed" from="StartButoon" to="." method="_on_start_butoon_pressed"]
+[connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="timeout" from="MessageTimer" to="." method="_on_message_timer_timeout"]
