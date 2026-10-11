@@ -1,0 +1,30 @@
+name: CI - Headless Test Suite
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Automated Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Godot Engine 4.5
+        run: |
+          curl -L -s https://github.com/godotengine/godot/releases/download/4.5-stable/Godot_v4.5-stable_linux.x86_64.zip -o godot.zip
+          unzip -q godot.zip
+          sudo mv Godot_v4.5-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+      - name: Verify Godot Installation
+        run: godot --version
+
+      - name: Execute Automated Headless Test Runner
+        run: |
+          godot --headless --path . --script tests/test_runner.gd
