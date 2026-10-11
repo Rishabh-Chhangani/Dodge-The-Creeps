@@ -752,3 +752,26 @@ I completed the full engineering implementation across all remaining project dim
    - Authored `.github/workflows/build-and-release.yml` (automated standalone Windows ZIP export and GitHub release drafting on semver tags).
    - Added root `LICENSE` (MIT) and overhauled root `README.md` with controls, architecture diagrams, testing guides, and build instructions.
    - Executed clean milestone git commits locally with zero push operations.
+
+---
+
+## Session 13: Godot Editor Exclusive Window Collision Troubleshooting — 2026-10-11
+
+### User
+
+```text
+ERROR: scene/main/window.cpp:1050 - Attempting to make child window exclusive, but the parent window already has another exclusive child. This window: /root/@EditorNode@20438/@Panel@14/@VBoxContainer@15/DockHSplitLeftL/DockHSplitLeftR/DockHSplitMain/@VBoxContainer@26/DockVSplitCenter/@VSplitContainer@62/@VBoxContainer@63/@EditorMainScreen@103/MainScreen/@WindowWrapper@12615/@ScriptEditor@12614/@ConfirmationDialog@12394, parent window: /root, current exclusive child window: /root/@EditorNode@20438/@Panel@14/@ConfirmationDialog@9337
+```
+
+### Assistant
+
+Diagnosed the warning as an internal UI modal collision within the running Godot Editor:
+1. **Cause**:
+   - The Godot Editor allows only one exclusive modal dialog per window at a time.
+   - An existing dialog (`@ConfirmationDialog@9337`, e.g. "Save scene?" or an unsaved changes prompt) was already open.
+   - Concurrently, external file modifications and additions (`tests/*.gd` / `.uid` files) triggered the Script Editor's "Reload from disk?" dialog (`@ScriptEditor@...@ConfirmationDialog@12394`).
+   - The editor failed to present the second dialog exclusively over the first.
+2. **Resolution**:
+   - Dismiss the underlying modal dialog in Godot (click Reload/OK or press `Escape`).
+   - Alternatively, restart the Godot Editor to cleanly re-index the project files.
+   - Tracked and committed the 5 generated `tests/*.gd.uid` files.
