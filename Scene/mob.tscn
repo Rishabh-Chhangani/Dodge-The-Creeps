@@ -68,12 +68,12 @@ animations = [{
 "speed": 3.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_q66a6"]
-radius = 37.0
-height = 102.0
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_je71b"]
+radius = 35.0
+height = 80.0
 
 [node name="Mob" type="RigidBody2D" groups=["mobs"]]
-position = Vector2(179, 327)
+collision_layer = 2
 collision_mask = 0
 gravity_scale = 0.0
 script = ExtResource("1_je71b")
@@ -85,8 +85,9 @@ sprite_frames = SubResource("SpriteFrames_nf4oq")
 animation = &"walk"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(9, 0)
 rotation = 1.5707964
-shape = SubResource("CapsuleShape2D_q66a6")
+shape = SubResource("CapsuleShape2D_je71b")
 
 [node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
 process_mode = 4

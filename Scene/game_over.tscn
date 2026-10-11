@@ -68,6 +68,12 @@ theme_override_font_sizes/font_size = 22
 text = "Score: 0"
 horizontal_alignment = 1
 
+[node name="HighScoreLabel" type="Label" parent="Overlay/CenterContainer/Panel/Buttons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Best: 0"
+horizontal_alignment = 1
+
 [node name="RestartButton" type="Button" parent="Overlay/CenterContainer/Panel/Buttons"]
 custom_minimum_size = Vector2(220, 64)
 layout_mode = 2

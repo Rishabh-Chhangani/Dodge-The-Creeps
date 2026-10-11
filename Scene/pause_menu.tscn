@@ -1,0 +1,110 @@
+[gd_scene load_steps=3 format=3 uid="uid://c7xkm5t8o2q1n"]
+
+[ext_resource type="Script" uid="uid://g3bhlok0hc23" path="res://script/pause_menu.gd" id="1_pause"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.08, 0.09, 0.13, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.55, 0.7, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="PauseMenu" type="CanvasLayer"]
+process_mode = 3
+layer = 3
+visible = false
+script = ExtResource("1_pause")
+
+[node name="Overlay" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="CenterContainer" type="CenterContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Overlay/CenterContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Buttons" type="VBoxContainer" parent="Overlay/CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Overlay/CenterContainer/Panel/Buttons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="SettingsBox" type="VBoxContainer" parent="Overlay/CenterContainer/Panel/Buttons"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MusicLabel" type="Label" parent="Overlay/CenterContainer/Panel/Buttons/SettingsBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Music Volume"
+
+[node name="MusicSlider" type="HSlider" parent="Overlay/CenterContainer/Panel/Buttons/SettingsBox"]
+custom_minimum_size = Vector2(220, 24)
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="SFXLabel" type="Label" parent="Overlay/CenterContainer/Panel/Buttons/SettingsBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "SFX Volume"
+
+[node name="SFXSlider" type="HSlider" parent="Overlay/CenterContainer/Panel/Buttons/SettingsBox"]
+custom_minimum_size = Vector2(220, 24)
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="ResumeButton" type="Button" parent="Overlay/CenterContainer/Panel/Buttons"]
+custom_minimum_size = Vector2(220, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Resume"
+
+[node name="RestartButton" type="Button" parent="Overlay/CenterContainer/Panel/Buttons"]
+custom_minimum_size = Vector2(220, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Restart"
+
+[connection signal="value_changed" from="Overlay/CenterContainer/Panel/Buttons/SettingsBox/MusicSlider" to="." method="_on_music_slider_value_changed"]
+[connection signal="value_changed" from="Overlay/CenterContainer/Panel/Buttons/SettingsBox/SFXSlider" to="." method="_on_sfx_slider_value_changed"]
+[connection signal="pressed" from="Overlay/CenterContainer/Panel/Buttons/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="Overlay/CenterContainer/Panel/Buttons/RestartButton" to="." method="_on_restart_button_pressed"]

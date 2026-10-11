@@ -48,11 +48,11 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_p6qlh"]
-radius = 40.0
-height = 102.0
+radius = 41.0
+height = 82.0
 
 [node name="Player" type="Area2D"]
-position = Vector2(168, 336)
+collision_mask = 2
 script = ExtResource("1_xa75v")
 metadata/_edit_group_ = true
 
@@ -60,9 +60,6 @@ metadata/_edit_group_ = true
 scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_r6jsd")
 animation = &"up"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_p6qlh")
 
 [node name="DeathParticles" type="CPUParticles2D" parent="."]
 emitting = false
@@ -77,5 +74,9 @@ initial_velocity_max = 220.0
 scale_amount_min = 3.0
 scale_amount_max = 6.0
 color = Color(1, 0.5, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("CapsuleShape2D_p6qlh")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

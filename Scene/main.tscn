@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://3f6l8p6w5dbn"]
+[gd_scene load_steps=10 format=3 uid="uid://3f6l8p6w5dbn"]
 
 [ext_resource type="Script" uid="uid://c114w6xs0o5eo" path="res://script/main.gd" id="1_r34rm"]
 [ext_resource type="PackedScene" uid="uid://bfwqlskpksyq0" path="res://Scene/mob.tscn" id="2_2wwxx"]
@@ -7,23 +7,27 @@
 [ext_resource type="AudioStream" uid="uid://c5aj8ehjt5ybv" path="res://art/House In a Forest Loop.ogg" id="5_3amdw"]
 [ext_resource type="AudioStream" uid="uid://dhvk34e70eme4" path="res://art/gameover.wav" id="6_1xcnr"]
 [ext_resource type="PackedScene" uid="uid://ydouojfa81at" path="res://Scene/game_over.tscn" id="7_game_over"]
+[ext_resource type="PackedScene" path="res://Scene/pause_menu.tscn" id="8_pause"]
 
 [sub_resource type="Curve2D" id="Curve2D_7mycd"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 0, -87, 0, 0, 0, 0, 358, -87, 0, 0, 0, 0, 356, 554, 0, 0, 0, 0, 2, 553, 0, 0, 0, 0, 0, 0)
+"points": PackedVector2Array(0, 0, 0, 0, 2, -88, 0, 0, 0, 0, 397, -87, 0, 0, 0, 0, 400, 555, 0, 0, 0, 0, 1, 555, 0, 0, 0, 0, 0, 0)
 }
 point_count = 5
 
 [node name="Main" type="Node2D"]
+position = Vector2(-1, -4)
 script = ExtResource("1_r34rm")
 mob_scene = ExtResource("2_2wwxx")
 game_over_scene = ExtResource("7_game_over")
 
 [node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(400, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 360.0
+offset_left = 3.0
+offset_right = 1155.0
 offset_bottom = 640.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -32,8 +36,10 @@ color = Color(0.82572967, 0.82633895, 0.2907587, 1)
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
 
+[node name="MobContainer" type="Node2D" parent="."]
+
 [node name="Player" parent="." instance=ExtResource("3_3amdw")]
-position = Vector2(224, 360)
+position = Vector2(201, 405)
 
 [node name="MobTimer" type="Timer" parent="."]
 wait_time = 0.5
@@ -52,19 +58,29 @@ position = Vector2(0, 88)
 curve = SubResource("Curve2D_7mycd")
 
 [node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
-position = Vector2(0, -87)
+position = Vector2(2, -88)
+rotation = 0.00253164
 
 [node name="HUD" parent="." instance=ExtResource("4_2wwxx")]
 
-[node name="Music" type="AudioStreamPlayer2D" parent="."]
+[node name="Music" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_3amdw")
-autoplay = true
+bus = &"Music"
 
-[node name="DeathSound" type="AudioStreamPlayer2D" parent="."]
+[node name="DeathSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("6_1xcnr")
+bus = &"SFX"
+
+[node name="GameOver" parent="." instance=ExtResource("7_game_over")]
+visible = false
+
+[node name="PauseMenu" parent="." instance=ExtResource("8_pause")]
 
 [connection signal="hit" from="Player" to="." method="game_over"]
 [connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
 [connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
 [connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
+[connection signal="pause_requested" from="HUD" to="." method="pause_game"]
 [connection signal="start_game" from="HUD" to="." method="new_game"]
+[connection signal="restart_requested" from="GameOver" to="." method="_on_game_over_restart_requested"]
+[connection signal="restart_requested" from="PauseMenu" to="." method="_on_pause_menu_restart_requested"]

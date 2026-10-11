@@ -1,3 +1,22 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Godot editor temporary files
+*.tmp
+
+# Local build and export output
+/build/
+/export/
+/scratch/
+
+# Local signing credentials and environment secrets
+*.keystore
+*.jks
+*.p12
+.env
+!.env.example
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
