@@ -26,6 +26,10 @@ window/handheld/orientation="portrait"
 
 project/assembly_name="Dodge The Creeps"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gspec/plugin.cfg")
+
 [input]
 
 move_right={
