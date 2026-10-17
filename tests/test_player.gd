@@ -4,6 +4,9 @@ extends RefCounted
 
 static func run(runner) -> void:
 	print("Running Player Tests...")
+	runner.assert_eq(int(ProjectSettings.get_setting("display/window/handheld/orientation")), DisplayServer.SCREEN_PORTRAIT, "Handheld orientation is locked to Portrait")
+	runner.assert_eq(int(ProjectSettings.get_setting("display/window/size/viewport_width")), 400, "Base viewport width is portrait (400)")
+	runner.assert_eq(int(ProjectSettings.get_setting("display/window/size/viewport_height")), 640, "Base viewport height is portrait (640)")
 	var player_scene: PackedScene = load("res://Scene/player.tscn")
 	var player = player_scene.instantiate()
 	runner.root.add_child(player)

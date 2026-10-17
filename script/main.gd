@@ -29,9 +29,14 @@ var trauma_time: float = 0.0
 @onready var pause_menu: CanvasLayer = $PauseMenu
 
 
+func _enter_tree() -> void:
+	if DisplayServer.has_feature(DisplayServer.FEATURE_ORIENTATION):
+		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_PORTRAIT)
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	if OS.has_feature("mobile") or OS.has_feature("android"):
+	if DisplayServer.has_feature(DisplayServer.FEATURE_ORIENTATION):
 		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_PORTRAIT)
 
 	_configure_layout()

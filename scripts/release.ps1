@@ -155,10 +155,13 @@ if (-not (Test-Path $apkPath)) {
     throw "Android APK not found at expected path: $apkPath"
 }
 
-# Verify Android portrait badging with aapt2
-$aapt2 = (Get-ChildItem -Path "$env:LOCALAPPDATA\Android\Sdk\build-tools" -Filter "aapt2.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
-if ($aapt2 -and (Test-Path $aapt2)) {
-    $badging = (cmd.exe /c "`"$aapt2`" dump badging `"$apkPath`" 2>nul") -join "`n"
+# Verify Android portrait badging with aapt
+$aapt = (Get-ChildItem -Path "$env:LOCALAPPDATA\Android\Sdk\build-tools" -Filter "aapt.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+if (-not $aapt) {
+    $aapt = (Get-ChildItem -Path "$env:LOCALAPPDATA\Android\Sdk\build-tools" -Filter "aapt2.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+}
+if ($aapt -and (Test-Path $aapt)) {
+    $badging = (cmd.exe /c "`"$aapt`" dump badging `"$apkPath`" 2>nul") -join "`n"
     if ($badging -match "android\.hardware\.screen\.portrait") {
         Write-Host "  -> Confirmed Android orientation: PORTRAIT" -ForegroundColor Green
     } else {

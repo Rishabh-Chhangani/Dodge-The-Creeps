@@ -28,6 +28,8 @@ func _notification(what: int) -> void:
 
 func _update_default_position() -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size
+	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
+		viewport_size = Vector2(400.0, 640.0)
 	# Voodoo style: positioned in the middle of the portrait screen
 	if viewport_size.y >= viewport_size.x:
 		default_position = Vector2(
@@ -136,36 +138,36 @@ func _draw() -> void:
 		return
 	
 	# Outer base circle (Voodoo / hypercasual modern aesthetic)
-	var base_alpha: float = 0.45 if is_active else 0.28
+	var base_alpha: float = 0.65 if is_active else 0.45
 	# Outer subtle shadow
-	draw_circle(base_position, base_radius + 4.0, Color(0.0, 0.0, 0.0, base_alpha * 0.4))
+	draw_circle(base_position, base_radius + 5.0, Color(0.0, 0.0, 0.0, base_alpha * 0.5))
 	# Base disc
-	draw_circle(base_position, base_radius, Color(0.12, 0.14, 0.22, base_alpha))
+	draw_circle(base_position, base_radius, Color(0.12, 0.16, 0.28, base_alpha))
 	# Outer ring border
-	draw_arc(base_position, base_radius, 0.0, TAU, 36, Color(1.0, 1.0, 1.0, base_alpha * 0.8), 2.5, true)
+	draw_arc(base_position, base_radius, 0.0, TAU, 36, Color(1.0, 1.0, 1.0, base_alpha * 0.95), 2.8, true)
 	
 	# Concentric guide ring
-	draw_arc(base_position, base_radius * 0.5, 0.0, TAU, 24, Color(1.0, 1.0, 1.0, base_alpha * 0.3), 1.5, true)
+	draw_arc(base_position, base_radius * 0.5, 0.0, TAU, 24, Color(1.0, 1.0, 1.0, base_alpha * 0.45), 1.8, true)
 	
 	# Cardinal direction ticks (up, down, left, right)
-	var tick_len: float = 6.0
-	var col_tick := Color(1.0, 1.0, 1.0, base_alpha * 0.6)
-	draw_line(base_position + Vector2(0, -base_radius + 2), base_position + Vector2(0, -base_radius + 2 + tick_len), col_tick, 2.0)
-	draw_line(base_position + Vector2(0, base_radius - 2), base_position + Vector2(0, base_radius - 2 - tick_len), col_tick, 2.0)
-	draw_line(base_position + Vector2(-base_radius + 2, 0), base_position + Vector2(-base_radius + 2 + tick_len, 0), col_tick, 2.0)
-	draw_line(base_position + Vector2(base_radius - 2, 0), base_position + Vector2(base_radius - 2 - tick_len, 0), col_tick, 2.0)
+	var tick_len: float = 7.0
+	var col_tick := Color(1.0, 1.0, 1.0, base_alpha * 0.8)
+	draw_line(base_position + Vector2(0, -base_radius + 2), base_position + Vector2(0, -base_radius + 2 + tick_len), col_tick, 2.5)
+	draw_line(base_position + Vector2(0, base_radius - 2), base_position + Vector2(0, base_radius - 2 - tick_len), col_tick, 2.5)
+	draw_line(base_position + Vector2(-base_radius + 2, 0), base_position + Vector2(-base_radius + 2 + tick_len, 0), col_tick, 2.5)
+	draw_line(base_position + Vector2(base_radius - 2, 0), base_position + Vector2(base_radius - 2 - tick_len, 0), col_tick, 2.5)
 	
 	# Connecting stick line when pulled
 	if is_active and tip_position != base_position:
-		draw_line(base_position, tip_position, Color(1.0, 1.0, 1.0, 0.35), 3.0, true)
+		draw_line(base_position, tip_position, Color(1.0, 1.0, 1.0, 0.5), 3.5, true)
 	
 	# Inner thumbstick / knob
-	var tip_alpha: float = 0.85 if is_active else 0.50
+	var tip_alpha: float = 0.95 if is_active else 0.80
 	# Shadow under knob
-	draw_circle(tip_position + Vector2(0, 2), tip_radius, Color(0.0, 0.0, 0.0, tip_alpha * 0.4))
+	draw_circle(tip_position + Vector2(0, 3), tip_radius, Color(0.0, 0.0, 0.0, tip_alpha * 0.5))
 	# Knob disc
-	draw_circle(tip_position, tip_radius, Color(0.85, 0.92, 1.0, tip_alpha))
+	draw_circle(tip_position, tip_radius, Color(0.88, 0.94, 1.0, tip_alpha))
 	# Knob border
-	draw_arc(tip_position, tip_radius, 0.0, TAU, 28, Color(1.0, 1.0, 1.0, tip_alpha), 2.0, true)
+	draw_arc(tip_position, tip_radius, 0.0, TAU, 28, Color(1.0, 1.0, 1.0, tip_alpha), 2.5, true)
 	# Center dot / grip
-	draw_circle(tip_position, tip_radius * 0.32, Color(0.4, 0.6, 0.9, tip_alpha * 0.7))
+	draw_circle(tip_position, tip_radius * 0.35, Color(0.28, 0.5, 0.9, tip_alpha * 0.85))

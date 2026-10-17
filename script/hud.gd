@@ -18,23 +18,29 @@ func _ready() -> void:
 		if OS.get_name() == "Windows" or OS.has_feature("pc"):
 			instruction_label.text = "Arrow Keys / WASD to Move • Esc to Pause"
 		else:
-			instruction_label.text = "Use Joystick or Drag to Move"
+			instruction_label.text = "Drag Joystick or Tap Start to Play"
 	if virtual_joystick != null:
-		virtual_joystick.hide()
+		virtual_joystick.show()
 		if not virtual_joystick.is_connected("joystick_moved", _on_joystick_moved):
 			virtual_joystick.joystick_moved.connect(_on_joystick_moved)
 
 
 func _on_joystick_moved(vector: Vector2) -> void:
+	# Voodoo style: touching/dragging joystick on start screen immediately starts game!
+	if start_button != null and start_button.visible and vector != Vector2.ZERO:
+		_on_start_button_pressed()
 	joystick_moved.emit(vector)
 
 
 func set_joystick_visible(visible_state: bool) -> void:
 	if virtual_joystick != null:
-		var is_touch_or_mobile: bool = OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("editor") or DisplayServer.is_touchscreen_available()
-		virtual_joystick.visible = visible_state and is_touch_or_mobile
-		if not virtual_joystick.visible and virtual_joystick.has_method("reset_joystick"):
-			virtual_joystick.reset_joystick()
+		virtual_joystick.visible = visible_state
+		if visible_state:
+			if virtual_joystick.has_method("_update_default_position"):
+				virtual_joystick._update_default_position()
+		else:
+			if virtual_joystick.has_method("reset_joystick"):
+				virtual_joystick.reset_joystick()
 
 
 func show_message(text: String) -> void:
@@ -60,7 +66,7 @@ func show_game_over() -> void:
 	if instruction_label != null:
 		instruction_label.show()
 	set_pause_button_visible(false)
-	set_joystick_visible(false)
+	set_joystick_visible(true)
 
 
 func update_score(score: int) -> void:
