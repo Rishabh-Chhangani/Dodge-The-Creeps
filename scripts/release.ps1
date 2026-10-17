@@ -78,8 +78,8 @@ function Get-NextTag {
     
     # Fetch tags silently from remote
     cmd.exe /c "git fetch --tags --force 2>nul" | Out-Null
-    $allTags = git tag -l "v*" --sort=-v:refname
-    $latestTag = if ($allTags) { $allTags[0] } else { $null }
+    $allTags = @(git tag -l "v*" --sort=-v:refname)
+    $latestTag = if ($allTags.Count -gt 0) { [string]$allTags[0] } else { $null }
 
     if (-not $latestTag) {
         return "v1.0.0"
