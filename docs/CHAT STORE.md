@@ -939,6 +939,40 @@ Successfully implemented both requirements:
    - Re-exported signed portrait APK: `export/android/DodgeTheCreeps.apk` (29.6 MB).
    - Re-exported Windows x86_64 desktop binary: `export/windows/DodgeTheCreeps.exe` and updated `export/DodgeTheCreeps-Windows-x86_64.zip` (34.0 MB).
 
+---
+
+## Session: Voodoo-Style Centered Virtual Joystick & Automated Release Task — 2026-10-17
+
+### User
+
+Make the relase an automated task also and in many games like Voodoo games the joystick is in the middle of the protrat screen so make it that
+
+### Assistant
+
+Implemented both features:
+
+1. **Voodoo-Style Centered Virtual Joystick**:
+   - Updated `script/virtual_joystick.gd`:
+     - **Centered Resting Position**: In portrait orientation (`viewport_size.y >= viewport_size.x`), default resting position is horizontally centered in the middle of the screen (`x = viewport_size.x * 0.5`, `y = viewport_size.y * 0.58`), comfortably accessible by either left or right thumb below the player and main UI.
+     - **Universal Dynamic Touch Activation**: Removed the left-side constraint. Touching anywhere across 100% of the screen width and 90% of screen height (below the top status header `y >= 75.0`) dynamically centers the joystick anchor directly under the user's thumb for effortless one-handed or two-handed steering.
+     - **Smooth Reset**: Upon release, smoothly resets back to the center of the portrait screen.
+   - Updated `tests/test_player.gd`:
+     - Added test assertion verifying that `VirtualJoystick.default_position.x` is centered at `0.5 * viewport.size.x`. Total test suite: **58 passed, 0 failed**.
+
+2. **Automated Release Task Pipeline**:
+   - Created `scripts/release.ps1` and `scripts/release.bat`:
+     - **Phase 1 (Validation)**: Executes headless test suite (`test_runner.gd`), halting release if any test fails.
+     - **Phase 2 (Android Export)**: Exports signed Android APK (`export/android/DodgeTheCreeps.apk`) locked to portrait.
+     - **Phase 3 (Orientation Verification)**: Inspects APK badging with `aapt2` to confirm `android.hardware.screen.portrait`.
+     - **Phase 4 (Windows Export)**: Exports Windows x86_64 executable (`export/windows/DodgeTheCreeps.exe`) with embedded PCK and compresses into `export/DodgeTheCreeps-Windows-x86_64.zip`.
+     - **Phase 5 (Reporting & CI Trigger)**: Displays artifact table with sizes and SHA256 checksums. Supports optional `-TagAndPush -Version <version>` to tag Git and push `--tags` to GitHub automatically.
+   - Upgraded `.github/workflows/build-and-release.yml`:
+     - Added automated test job that gates exports.
+     - Added `build-android` job to compile and sign Android APK in CI.
+     - Added `workflow_dispatch` trigger with `release_tag` input so releases can be created on-demand from the GitHub Actions web UI or via tag push.
+     - Publishes GitHub Releases with both `DodgeTheCreeps-Windows-x86_64.zip` and `DodgeTheCreeps.apk` attached.
+
+
 
 
 

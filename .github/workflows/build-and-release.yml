@@ -5,10 +5,34 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
 
 jobs:
+  test:
+    name: Run Automated Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Godot Engine 4.5
+        run: |
+          curl -L -s https://github.com/godotengine/godot/releases/download/4.5-stable/Godot_v4.5-stable_linux.x86_64.zip -o godot.zip
+          unzip -q godot.zip
+          sudo mv Godot_v4.5-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+      - name: Execute Automated Headless Test Runner
+        run: |
+          godot --headless --path . --script res://tests/test_runner.gd
+
   build-windows:
     name: Export Windows Desktop
+    needs: [test]
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +54,7 @@ jobs:
       - name: Export Windows 64-bit Executable
         run: |
           mkdir -p export/windows
-          godot --headless --path . --export-release "Windows Desktop" export/windows/DodgeTheCreeps.exe
+          godot --headless --path . --export-debug "Windows Desktop" export/windows/DodgeTheCreeps.exe
 
       - name: Package Windows Artifact
         run: |
@@ -44,11 +68,70 @@ jobs:
           name: DodgeTheCreeps-Windows-x86_64
           path: DodgeTheCreeps-Windows-x86_64.zip
 
+  build-android:
+    name: Export Android APK
+    needs: [test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Download Godot Engine & Export Templates
+        run: |
+          curl -L -s https://github.com/godotengine/godot/releases/download/4.5-stable/Godot_v4.5-stable_linux.x86_64.zip -o godot.zip
+          unzip -q godot.zip
+          sudo mv Godot_v4.5-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+          mkdir -p ~/.local/share/godot/export_templates/4.5.stable
+          curl -L -s https://github.com/godotengine/godot/releases/download/4.5-stable/Godot_v4.5-stable_export_templates.tpz -o templates.tpz
+          unzip -q templates.tpz
+          cp -r templates/* ~/.local/share/godot/export_templates/4.5.stable/
+
+      - name: Create Debug Keystore & Configure Editor Settings
+        run: |
+          mkdir -p ~/.config/godot/keystores
+          keytool -genkey -v -keystore ~/.config/godot/keystores/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+
+          mkdir -p ~/.config/godot
+          cat <<EOF > ~/.config/godot/editor_settings-4.tres
+[gd_resource type="EditorSettings" format=3]
+[resource]
+export/android/android_sdk_path = "$ANDROID_HOME"
+export/android/debug_keystore = "$HOME/.config/godot/keystores/debug.keystore"
+export/android/debug_keystore_user = "androiddebugkey"
+export/android/debug_keystore_pass = "android"
+export/android/force_system_user = false
+EOF
+
+      - name: Export Android APK
+        run: |
+          mkdir -p export/android
+          godot --headless --path . --export-debug "Android" export/android/DodgeTheCreeps.apk
+
+      - name: Upload Android Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DodgeTheCreeps-Android
+          path: export/android/DodgeTheCreeps.apk
+
   release:
     name: Create GitHub Release
-    needs: [build-windows]
-    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-windows, build-android]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
@@ -59,11 +142,18 @@ jobs:
         with:
           name: DodgeTheCreeps-Windows-x86_64
 
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: DodgeTheCreeps-Android
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.release_tag || github.ref_name }}
           files: |
             DodgeTheCreeps-Windows-x86_64.zip
+            DodgeTheCreeps.apk
           generate_release_notes: true
           draft: false
           prerelease: false

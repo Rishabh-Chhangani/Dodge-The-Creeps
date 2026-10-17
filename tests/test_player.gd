@@ -53,4 +53,6 @@ static func run(runner) -> void:
 	runner.root.add_child(hud)
 	runner.assert_true(hud.has_node("VirtualJoystick"), "HUD contains VirtualJoystick node")
 	runner.assert_true(hud.has_signal("joystick_moved"), "HUD emits joystick_moved signal")
+	var joystick = hud.get_node("VirtualJoystick")
+	runner.assert_eq(joystick.default_position.x, joystick.get_viewport_rect().size.x * 0.5, "Joystick is centered horizontally in middle of screen")
 	hud.queue_free()
