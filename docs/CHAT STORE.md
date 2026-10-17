@@ -882,4 +882,19 @@ Adjusted the desktop window and viewport dimensions from 1280 × 720 down to **1
 2. **Scene Setup**: Updated `Scene/main.tscn` default `ColorRect` and `Curve2D` perimeter bounds to 1024 × 576, with the player start centered at (512, 288).
 3. **Automated Verification**: Headless tests run and verified (49 passed, 0 failed).
 
+---
+
+## Session: Windows PE Version Format & Android SDK Path Fix — 2026-10-17
+
+### User
+
+And for exe it says Invalid project version, Invalid product version even though this my first time exporting
+
+### Assistant
+
+1. **Root Cause**: Windows PE binaries require a 4-part numeric version format (`major.minor.build.revision`, e.g. `1.0.0.0`), whereas semantic versioning `1.0.0` was present in `export_presets.cfg`.
+2. **Resolution**: Updated `application/file_version` and `application/product_version` to `"1.0.0.0"` in `export_presets.cfg`.
+3. **Verification**: Successfully exported standalone `export/windows/DodgeTheCreeps.exe` (98.4 MB) with embedded PCK data.
+
+
 
