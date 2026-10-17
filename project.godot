@@ -28,7 +28,7 @@ window/size/window_height_override=576
 window/size/resizable=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
-window/handheld/orientation="portrait"
+window/handheld/orientation=1
 
 [dotnet]
 

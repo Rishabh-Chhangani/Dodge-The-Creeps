@@ -894,7 +894,51 @@ And for exe it says Invalid project version, Invalid product version even though
 
 1. **Root Cause**: Windows PE binaries require a 4-part numeric version format (`major.minor.build.revision`, e.g. `1.0.0.0`), whereas semantic versioning `1.0.0` was present in `export_presets.cfg`.
 2. **Resolution**: Updated `application/file_version` and `application/product_version` to `"1.0.0.0"` in `export_presets.cfg`.
-3. **Verification**: Successfully exported standalone `export/windows/DodgeTheCreeps.exe` (98.4 MB) with embedded PCK data.
+## Session: Mobile Portrait Orientation & Minecraft/CODM-Style Virtual Joystick — 2026-10-17
+
+### User
+
+The Apk version is working but not the way I expected it to We need to add an joystick like minecraft or CODM to it which will control the player and it need to open as protrat not landscape in the mobile.
+
+### Assistant
+
+Successfully implemented both requirements:
+
+1. **Android Portrait Orientation Lock**:
+   - Fixed `window/handheld/orientation=1` in `project.godot`. In Godot 4, passing the string `"portrait"` caused the C++ exporter to evaluate `(int)Variant("portrait") == 0` (`SCREEN_LANDSCAPE`). Storing it as integer `1` (`SCREEN_PORTRAIT`) correctly emits `uses-feature: name='android.hardware.screen.portrait'` in the APK manifest.
+   - Added runtime enforcement via `DisplayServer.screen_set_orientation(DisplayServer.SCREEN_PORTRAIT)` in `script/main.gd` when running on mobile devices.
+   - Verified badging output with `aapt2 dump badging export/android/DodgeTheCreeps.apk`:
+     ```text
+     uses-feature: name='android.hardware.screen.portrait'
+     uses-implied-feature: name='android.hardware.screen.portrait' reason='one or more activities have specified a portrait orientation'
+     ```
+
+2. **Minecraft / Call of Duty: Mobile Dynamic Virtual Joystick**:
+   - Created `script/virtual_joystick.gd` extending `Control`:
+     - **Dynamic / Floating Steering**: Resting position is comfortably situated in the lower-left thumb zone. Touching anywhere in the lower-left interactive area centers the joystick anchor on the touch point.
+     - **Multi-Touch Isolation**: Tracks a dedicated `touch_id` so simultaneous touches (e.g. tapping the pause button in the top-right) do not interfere with steering.
+     - **Analog Output & Deadzone**: Normalizes thumb displacement to a vector `(0.0..1.0)` with an 8% deadzone, supporting analog variable speed just like console/mobile analog sticks.
+     - **Zero-Asset Procedural Graphics**: Draws crisp vector circles, outer glowing ring, concentric guide circle, cardinal direction ticks, and thumb knob with dynamic opacity (`_draw()`).
+     - **Lifecycle & Pause Safety**: Resets joystick state automatically when hidden or when the game pauses.
+   - Updated `script/player.gd`:
+     - Added `joystick_vector` and `set_joystick_vector(v: Vector2)`.
+     - In `_process()`, priority order is: Keyboard WASD/Arrow keys (PC) -> Virtual Joystick (Mobile) -> Direct Touch Drag (fallback/tests).
+     - Applied analog velocity `joystick_vector * speed`.
+     - Updated sprite animations and flips based on directional movement vectors.
+   - Integrated into `Scene/hud.tscn` and `script/hud.gd`:
+     - Added `VirtualJoystick` Control node (full-screen anchor with `mouse_filter = IGNORE` so buttons remain clickable).
+     - Connected `joystick_moved` signal through `HUD` to `player.set_joystick_vector`.
+     - Automatically displays joystick on mobile (`OS.has_feature("mobile")` / `OS.has_feature("android")` / touchscreen devices) and in the Godot Editor for easy testing, while keeping clean PC keyboard instructions for desktop exports.
+     - Wires visibility to pause/resume states.
+
+3. **Automated Verification**:
+   - Expanded test suite in `tests/test_player.gd` to verify joystick input, movement velocity, animation state changes, and HUD signal wiring.
+   - Executed headless test runner with Godot 4.5: **57 passed, 0 failed**.
+
+4. **Production Build Generation**:
+   - Re-exported signed portrait APK: `export/android/DodgeTheCreeps.apk` (29.6 MB).
+   - Re-exported Windows x86_64 desktop binary: `export/windows/DodgeTheCreeps.exe` and updated `export/DodgeTheCreeps-Windows-x86_64.zip` (34.0 MB).
+
 
 
 

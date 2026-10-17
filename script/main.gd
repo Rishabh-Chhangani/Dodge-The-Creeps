@@ -31,6 +31,9 @@ var trauma_time: float = 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if OS.has_feature("mobile") or OS.has_feature("android"):
+		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_PORTRAIT)
+
 	_configure_layout()
 	get_viewport().size_changed.connect(_configure_layout)
 
@@ -47,6 +50,12 @@ func _ready() -> void:
 		game_over_ui.hide()
 	if pause_menu != null:
 		pause_menu.hide()
+		if pause_menu.has_signal("resume_requested") and not pause_menu.resume_requested.is_connected(_on_pause_menu_resume_requested):
+			pause_menu.resume_requested.connect(_on_pause_menu_resume_requested)
+
+	if hud != null and hud.has_signal("joystick_moved") and player != null and player.has_method("set_joystick_vector"):
+		if not hud.joystick_moved.is_connected(player.set_joystick_vector):
+			hud.joystick_moved.connect(player.set_joystick_vector)
 
 
 func _configure_layout() -> void:
@@ -84,6 +93,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					pause_menu.resume_game()
 				else:
 					get_tree().paused = false
+				if hud != null and hud.has_method("set_joystick_visible"):
+					hud.set_joystick_visible(true)
 			else:
 				pause_game()
 			get_viewport().set_input_as_handled()
@@ -152,10 +163,19 @@ func pause_game() -> void:
 	if not is_game_active:
 		return
 	_ensure_nodes()
+	if hud != null and hud.has_method("set_joystick_visible"):
+		hud.set_joystick_visible(false)
+	if player != null and player.has_method("set_joystick_vector"):
+		player.set_joystick_vector(Vector2.ZERO)
 	if pause_menu != null and pause_menu.has_method("pause_game"):
 		pause_menu.pause_game()
 	elif is_inside_tree():
 		get_tree().paused = true
+
+
+func _on_pause_menu_resume_requested() -> void:
+	if is_game_active and hud != null and hud.has_method("set_joystick_visible"):
+		hud.set_joystick_visible(true)
 
 
 func _on_pause_menu_restart_requested() -> void:
@@ -173,6 +193,10 @@ func game_over() -> void:
 	
 	if hud.has_method("set_pause_button_visible"):
 		hud.set_pause_button_visible(false)
+	if hud.has_method("set_joystick_visible"):
+		hud.set_joystick_visible(false)
+	if player != null and player.has_method("set_joystick_vector"):
+		player.set_joystick_vector(Vector2.ZERO)
 
 	# High score persistence (Flaw 8)
 	if score > high_score:
@@ -226,6 +250,8 @@ func new_game() -> void:
 	hud.show_message("Get Ready")
 	if hud.has_method("set_pause_button_visible"):
 		hud.set_pause_button_visible(true)
+	if hud.has_method("set_joystick_visible"):
+		hud.set_joystick_visible(true)
 	music_player.play()
 
 

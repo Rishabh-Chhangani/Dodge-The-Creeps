@@ -5,6 +5,7 @@ signal hit #This defines a custom signal called "hit" that we will have our play
 var screen_size: Vector2 # To Set Size of the Game Window 
 var target_position: Vector2 = Vector2.ZERO
 var is_touch_active: bool = false
+var joystick_vector: Vector2 = Vector2.ZERO
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -17,6 +18,11 @@ func _ready() -> void: #This funtion is called when a node enters the scene tree
 
 func _on_viewport_size_changed() -> void:
 	screen_size = get_viewport_rect().size
+
+func set_joystick_vector(v: Vector2) -> void:
+	joystick_vector = v
+	if joystick_vector != Vector2.ZERO:
+		is_touch_active = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -46,6 +52,9 @@ func _process(delta: float) -> void:
 	if velocity.length() > 0:
 		velocity = velocity.normalized() * speed
 		is_touch_active = false
+	elif joystick_vector.length() > 0:
+		velocity = joystick_vector * speed
+		is_touch_active = false
 	elif is_touch_active:
 		var diff: Vector2 = target_position - position
 		if diff.length() > 10.0:
@@ -53,8 +62,7 @@ func _process(delta: float) -> void:
 		else:
 			velocity = Vector2.ZERO
 	
-	if velocity.length() > 0 :
-		velocity = velocity.normalized() * speed
+	if velocity.length() > 0:
 		animated_sprite.play()
 	else:
 		animated_sprite.stop()
@@ -68,20 +76,21 @@ func _process(delta: float) -> void:
 	var target_scale := Vector2(0.80, 0.70) if velocity.length() > 0 else Vector2(0.75, 0.75)
 	animated_sprite.scale = animated_sprite.scale.lerp(target_scale, delta * 12.0)
 
-	if velocity.x != 0:
+	if absf(velocity.x) > 1.0:
 		animated_sprite.animation = "walk"
 		animated_sprite.flip_v = false
 		animated_sprite.flip_h = velocity.x < 0
-	elif velocity.y != 0:
+	elif absf(velocity.y) > 1.0:
 		animated_sprite.animation = "up"
-		animated_sprite.flip_v = false
-		animated_sprite.flip_h = velocity.x < 0
+		animated_sprite.flip_v = velocity.y > 0
+		animated_sprite.flip_h = false
 		
 		
 func _on_body_entered(_body: Node2D) -> void:
 	animated_sprite.hide() #player disappears after being hit 
 	hit.emit()
 	is_touch_active = false
+	joystick_vector = Vector2.ZERO
 	if death_particles != null:
 		death_particles.restart()
 		death_particles.emitting = true
@@ -90,6 +99,7 @@ func start(pos: Vector2) -> void:
 	position = pos
 	target_position = pos
 	is_touch_active = false
+	joystick_vector = Vector2.ZERO
 	show()
 	animated_sprite.show()
 	collision_shape.disabled = false

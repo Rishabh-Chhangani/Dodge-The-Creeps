@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal start_game
 signal pause_requested
+signal joystick_moved(vector: Vector2)
 
 @onready var score_label: Label = $ScoreLabel
 @onready var message_label: Label = $Message
@@ -9,6 +10,7 @@ signal pause_requested
 @onready var instruction_label: Label = $InstructionLabel
 @onready var message_timer: Timer = $MessageTimer
 @onready var pause_button: Button = $PauseButton
+@onready var virtual_joystick: Control = $VirtualJoystick if has_node("VirtualJoystick") else null
 
 
 func _ready() -> void:
@@ -16,7 +18,23 @@ func _ready() -> void:
 		if OS.get_name() == "Windows" or OS.has_feature("pc"):
 			instruction_label.text = "Arrow Keys / WASD to Move • Esc to Pause"
 		else:
-			instruction_label.text = "Drag or Arrow Keys to Move"
+			instruction_label.text = "Use Joystick or Drag to Move"
+	if virtual_joystick != null:
+		virtual_joystick.hide()
+		if not virtual_joystick.is_connected("joystick_moved", _on_joystick_moved):
+			virtual_joystick.joystick_moved.connect(_on_joystick_moved)
+
+
+func _on_joystick_moved(vector: Vector2) -> void:
+	joystick_moved.emit(vector)
+
+
+func set_joystick_visible(visible_state: bool) -> void:
+	if virtual_joystick != null:
+		var is_touch_or_mobile: bool = OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("editor") or DisplayServer.is_touchscreen_available()
+		virtual_joystick.visible = visible_state and is_touch_or_mobile
+		if not virtual_joystick.visible and virtual_joystick.has_method("reset_joystick"):
+			virtual_joystick.reset_joystick()
 
 
 func show_message(text: String) -> void:
@@ -42,6 +60,7 @@ func show_game_over() -> void:
 	if instruction_label != null:
 		instruction_label.show()
 	set_pause_button_visible(false)
+	set_joystick_visible(false)
 
 
 func update_score(score: int) -> void:

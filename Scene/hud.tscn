@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://c2cwchqdpt3n5"]
+[gd_scene load_steps=6 format=3 uid="uid://c2cwchqdpt3n5"]
 
 [ext_resource type="Script" uid="uid://cpqsx725apfvm" path="res://script/hud.gd" id="1_3quw2"]
 [ext_resource type="FontFile" uid="uid://vg7pkj4vj8bf" path="res://fonts/Xolonium-Regular.ttf" id="2_fmoiy"]
+[ext_resource type="Script" path="res://script/virtual_joystick.gd" id="3_joyst"]
 
 [sub_resource type="InputEventAction" id="InputEventAction_3quw2"]
 action = &"start_game"
@@ -99,6 +100,17 @@ text = "||"
 [node name="MessageTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="VirtualJoystick" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_joyst")
 
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="PauseButton" to="." method="_on_pause_button_pressed"]
