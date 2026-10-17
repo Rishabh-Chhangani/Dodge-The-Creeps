@@ -67,7 +67,7 @@ func _configure_layout() -> void:
 	_ensure_nodes()
 	var viewport_size: Vector2 = get_viewport_rect().size
 	if start_position != null:
-		start_position.position = viewport_size * 0.5
+		start_position.position = Vector2(viewport_size.x * 0.5, viewport_size.y * 0.38)
 	if mob_path != null:
 		mob_path.position = Vector2.ZERO
 

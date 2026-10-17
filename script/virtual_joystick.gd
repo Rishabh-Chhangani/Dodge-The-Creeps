@@ -30,16 +30,16 @@ func _update_default_position() -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(400.0, 640.0)
-	# Voodoo style: positioned in the middle of the portrait screen
+	# Voodoo style: comfortable thumb zone in lower portion of screen (clear of player)
 	if viewport_size.y >= viewport_size.x:
 		default_position = Vector2(
 			viewport_size.x * 0.5,
-			viewport_size.y * 0.58
+			viewport_size.y * 0.72
 		)
 	else:
 		default_position = Vector2(
 			viewport_size.x * 0.5,
-			viewport_size.y * 0.65
+			viewport_size.y * 0.72
 		)
 	if not is_active:
 		base_position = default_position
