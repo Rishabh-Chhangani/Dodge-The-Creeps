@@ -976,3 +976,26 @@ Implemented both features:
 
 
 
+
+---
+
+## Session: Automatic Tag Updating and Auto-Increment — 2026-10-17
+
+### User
+
+I want the tag to also be updated automatically
+
+### Assistant
+
+Fully automated Git tag generation and semantic incrementing:
+
+1. **Automatic Tag Detection & Increment in `scripts/release.ps1`**:
+   - Added `Get-NextTag` function that fetches existing remote/local tags (`git tag -l "v*" --sort=-v:refname`).
+   - Automatically computes the next semantic version (defaults to incrementing patch: e.g. `v1.0.0` -> `v1.0.1`, or supports `-Bump minor` / `-Bump major`).
+   - Automatically synchronizes `export_presets.cfg` (`version/code`, `version/name`, `application/file_version`, `application/product_version`) with the new version.
+   - Automatically commits the version change if needed (`chore(release): bump version to <version>`).
+   - Automatically creates the annotated Git tag (`git tag -a vX.Y.Z -m "Release vX.Y.Z"`).
+   - Automatically pushes the commit and tag to GitHub (`git push origin main`, `git push origin vX.Y.Z`), triggering the GitHub Actions CI/CD release workflow without requiring manual Git commands from the user.
+
+2. **Automated Tag Resolution in GitHub Actions CI/CD**:
+   - In `.github/workflows/build-and-release.yml`, added a `Resolve Release Tag` step that automatically calculates the next version tag if the workflow is run manually or triggered without an explicit tag input.

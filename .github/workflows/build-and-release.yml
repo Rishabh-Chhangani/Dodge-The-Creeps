@@ -147,10 +147,32 @@ EOF
         with:
           name: DodgeTheCreeps-Android
 
+      - name: Resolve Release Tag
+        id: resolve_tag
+        run: |
+          if [ -n "${{ github.event.inputs.release_tag }}" ]; then
+            echo "tag=${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            git fetch --tags --force
+            LATEST=$(git tag -l "v*" --sort=-v:refname | head -n 1)
+            if [ -z "$LATEST" ]; then
+              echo "tag=v1.0.0" >> $GITHUB_OUTPUT
+            else
+              V=${LATEST#v}
+              MAJOR=$(echo $V | cut -d. -f1)
+              MINOR=$(echo $V | cut -d. -f2)
+              PATCH=$(echo $V | cut -d. -f3)
+              PATCH=$((PATCH + 1))
+              echo "tag=v${MAJOR}.${MINOR}.${PATCH}" >> $GITHUB_OUTPUT
+            fi
+          fi
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.release_tag || github.ref_name }}
+          tag_name: ${{ steps.resolve_tag.outputs.tag }}
           files: |
             DodgeTheCreeps-Windows-x86_64.zip
             DodgeTheCreeps.apk
