@@ -31,12 +31,62 @@ var trauma_time: float = 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	_configure_layout()
+	get_viewport().size_changed.connect(_configure_layout)
+
+	# Configure background music to loop seamlessly
+	if music_player != null and music_player.stream != null:
+		if music_player.stream is AudioStreamOggVorbis:
+			(music_player.stream as AudioStreamOggVorbis).loop = true
+		if not music_player.finished.is_connected(_on_music_finished):
+			music_player.finished.connect(_on_music_finished)
+
 	high_score = SaveManager.load_high_score()
 	SaveManager.apply_saved_audio_settings()
 	if game_over_ui != null:
 		game_over_ui.hide()
 	if pause_menu != null:
 		pause_menu.hide()
+
+
+func _configure_layout() -> void:
+	_ensure_nodes()
+	var viewport_size: Vector2 = get_viewport_rect().size
+	if start_position != null:
+		start_position.position = viewport_size * 0.5
+	if mob_path != null:
+		mob_path.position = Vector2.ZERO
+
+		var spawn_curve := Curve2D.new()
+		spawn_curve.add_point(Vector2(0.0, 0.0))
+		spawn_curve.add_point(Vector2(viewport_size.x, 0.0))
+		spawn_curve.add_point(Vector2(viewport_size.x, viewport_size.y))
+		spawn_curve.add_point(Vector2(0.0, viewport_size.y))
+		spawn_curve.add_point(Vector2(0.0, 0.0))
+		mob_path.curve = spawn_curve
+
+	if has_node("ColorRect"):
+		var color_rect: ColorRect = $ColorRect
+		color_rect.position = Vector2.ZERO
+		color_rect.size = viewport_size
+
+
+func _on_music_finished() -> void:
+	if is_game_active and music_player != null:
+		music_player.play()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE):
+		if is_game_active:
+			if get_tree().paused:
+				if pause_menu != null and pause_menu.has_method("resume_game"):
+					pause_menu.resume_game()
+				else:
+					get_tree().paused = false
+			else:
+				pause_game()
+			get_viewport().set_input_as_handled()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -169,6 +219,7 @@ func new_game() -> void:
 		pause_menu.resume_game()
 
 	clear_mobs()
+	_configure_layout()
 	player.start(start_position.position) 
 	start_timer.start()
 	hud.update_score(score)
@@ -189,7 +240,7 @@ func _on_mob_timer_timeout() -> void:
 	mob_spawn_location.progress_ratio = randf()
 	
 	#Set the mob's position to random location
-	mob.position = mob_spawn_location.position
+	mob.position = mob_spawn_location.global_position
 	
 	#Set the mob's direction perpendicular to the path direction 
 	var direction: float = mob_spawn_location.rotation + PI / 2.0

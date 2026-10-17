@@ -11,6 +11,14 @@ signal pause_requested
 @onready var pause_button: Button = $PauseButton
 
 
+func _ready() -> void:
+	if instruction_label != null:
+		if OS.get_name() == "Windows" or OS.has_feature("pc"):
+			instruction_label.text = "Arrow Keys / WASD to Move • Esc to Pause"
+		else:
+			instruction_label.text = "Drag or Arrow Keys to Move"
+
+
 func show_message(text: String) -> void:
 	message_label.text = text
 	message_label.show()

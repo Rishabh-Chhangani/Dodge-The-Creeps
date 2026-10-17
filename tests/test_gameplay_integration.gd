@@ -15,6 +15,12 @@ static func run(runner) -> void:
 	runner.assert_true(death_node is AudioStreamPlayer, "DeathSound is non-spatial AudioStreamPlayer")
 	runner.assert_eq(music_node.bus, &"Music", "Music is routed to Music bus")
 	runner.assert_eq(death_node.bus, &"SFX", "DeathSound is routed to SFX bus")
+	if music_node.stream is AudioStreamOggVorbis:
+		runner.assert_true(music_node.stream.loop, "Background music stream is configured to loop")
+
+	# Verify background ColorRect
+	var color_rect = main_instance.get_node("ColorRect")
+	runner.assert_true(color_rect.size == main_instance.get_viewport_rect().size, "ColorRect fills viewport dimensions")
 	
 	# Verify MobContainer and spawning
 	runner.assert_true(main_instance.has_node("MobContainer"), "Main contains MobContainer node")
@@ -23,6 +29,8 @@ static func run(runner) -> void:
 	
 	main_instance._on_mob_timer_timeout()
 	runner.assert_eq(container.get_child_count(), 1, "Mob spawned directly into MobContainer")
+	var spawned_mob = container.get_child(0)
+	runner.assert_true(spawned_mob.position.x >= 0.0 and spawned_mob.position.y >= 0.0, "Spawned mob is placed along valid viewport perimeter")
 	
 	main_instance.clear_mobs()
 	runner.assert_true(true, "clear_mobs cleans up container instances")
@@ -41,6 +49,15 @@ static func run(runner) -> void:
 	pause_menu.resume_game()
 	runner.assert_true(not pause_menu.visible, "PauseMenu closes on resume")
 	runner.assert_true(not runner.paused, "SceneTree is unpaused on resume")
+
+	# Verify ESC key pauses and unpauses
+	var esc_event := InputEventKey.new()
+	esc_event.pressed = true
+	esc_event.keycode = KEY_ESCAPE
+	main_instance._unhandled_input(esc_event)
+	runner.assert_true(pause_menu.visible, "ESC key pauses active game")
+	pause_menu._unhandled_input(esc_event)
+	runner.assert_true(not pause_menu.visible, "ESC key resumes paused game")
 	
 	# Verify GameOver overlay
 	var game_over = main_instance.get_node("GameOver")

@@ -7,30 +7,23 @@
 [ext_resource type="AudioStream" uid="uid://c5aj8ehjt5ybv" path="res://art/House In a Forest Loop.ogg" id="5_3amdw"]
 [ext_resource type="AudioStream" uid="uid://dhvk34e70eme4" path="res://art/gameover.wav" id="6_1xcnr"]
 [ext_resource type="PackedScene" uid="uid://ydouojfa81at" path="res://Scene/game_over.tscn" id="7_game_over"]
-[ext_resource type="PackedScene" path="res://Scene/pause_menu.tscn" id="8_pause"]
+[ext_resource type="PackedScene" uid="uid://c7xkm5t8o2q1n" path="res://Scene/pause_menu.tscn" id="8_pause"]
 
 [sub_resource type="Curve2D" id="Curve2D_7mycd"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 2, -88, 0, 0, 0, 0, 397, -87, 0, 0, 0, 0, 400, 555, 0, 0, 0, 0, 1, 555, 0, 0, 0, 0, 0, 0)
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1024, 0, 0, 0, 0, 0, 1024, 576, 0, 0, 0, 0, 0, 576, 0, 0, 0, 0, 0, 0)
 }
 point_count = 5
 
 [node name="Main" type="Node2D"]
-position = Vector2(-1, -4)
 script = ExtResource("1_r34rm")
 mob_scene = ExtResource("2_2wwxx")
 game_over_scene = ExtResource("7_game_over")
 
 [node name="ColorRect" type="ColorRect" parent="."]
-custom_minimum_size = Vector2(400, 0)
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_right = 1155.0
-offset_bottom = 640.0
-grow_horizontal = 2
-grow_vertical = 2
+custom_minimum_size = Vector2(400, 576)
+offset_right = 1024.0
+offset_bottom = 576.0
 color = Color(0.82572967, 0.82633895, 0.2907587, 1)
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -39,7 +32,7 @@ anchor_mode = 0
 [node name="MobContainer" type="Node2D" parent="."]
 
 [node name="Player" parent="." instance=ExtResource("3_3amdw")]
-position = Vector2(201, 405)
+position = Vector2(512, 288)
 
 [node name="MobTimer" type="Timer" parent="."]
 wait_time = 0.5
@@ -51,15 +44,12 @@ wait_time = 2.0
 one_shot = true
 
 [node name="StartPosition" type="Marker2D" parent="."]
-position = Vector2(184, 344)
+position = Vector2(512, 288)
 
 [node name="MobPath" type="Path2D" parent="."]
-position = Vector2(0, 88)
 curve = SubResource("Curve2D_7mycd")
 
 [node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
-position = Vector2(2, -88)
-rotation = 0.00253164
 
 [node name="HUD" parent="." instance=ExtResource("4_2wwxx")]
 

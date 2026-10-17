@@ -16,6 +16,13 @@ func _ready() -> void:
 	_load_audio_sliders()
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and (event.is_action_pressed("pause") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE)):
+		resume_game()
+		resume_requested.emit()
+		get_viewport().set_input_as_handled()
+
+
 func _load_audio_sliders() -> void:
 	if music_slider != null:
 		music_slider.value = SaveManager.get_bus_volume("Music")

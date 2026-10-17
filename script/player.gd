@@ -12,7 +12,11 @@ var is_touch_active: bool = false
 
 func _ready() -> void: #This funtion is called when a node enters the scene tree.
 	screen_size = get_viewport_rect().size
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	hide()
+
+func _on_viewport_size_changed() -> void:
+	screen_size = get_viewport_rect().size
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:

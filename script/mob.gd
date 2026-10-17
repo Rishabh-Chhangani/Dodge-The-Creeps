@@ -5,12 +5,18 @@ extends RigidBody2D
 var mob_type: String = ""
 var base_velocity: Vector2 = Vector2.ZERO
 var wave_time: float = 0.0
+var _is_spawned: bool = false
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if animated_sprite == null:
 		animated_sprite = $AnimatedSprite2D
+	
+	if is_inside_tree():
+		get_tree().create_timer(0.3).timeout.connect(func(): _is_spawned = true)
+	else:
+		_is_spawned = true
 	
 	var mob_types: Array = Array(animated_sprite.sprite_frames.get_animation_names())
 	mob_type = mob_types.pick_random()
@@ -39,4 +45,5 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
-	queue_free()
+	if _is_spawned:
+		queue_free()

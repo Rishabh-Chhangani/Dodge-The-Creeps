@@ -46,6 +46,11 @@ Originally based on the official Godot tutorial, this project has been re-engine
 | **Mobile / Touch** | Move Character | Drag anywhere across the viewport |
 | **Mobile / Touch** | Pause Game | Tap the top-right **Pause (⏸)** button |
 
+## 🖥️ Display
+
+- **Windows** uses a 1024 x 576 (16:9) game viewport and resizable window with aspect lock. The play area, player start point, and enemy spawn route dynamically adapt to the landscape layout.
+- **Android** keeps its portrait orientation and 400 x 640 game viewport.
+
 ---
 
 ## 🏗️ Architecture & Scene Structure
